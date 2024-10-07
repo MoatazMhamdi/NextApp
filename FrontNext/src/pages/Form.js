@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'; 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { signupUser } from './service/userService';  // Adjust path to your service function
+import axiosInstance from './service/axios'; // Import axios instance
 
 const PARIS_COORDINATES = { lat: 48.8566, lng: 2.3522 }; // Coordinates for the center of Paris
 
@@ -102,18 +102,13 @@ export default function Form() {
         };
 
         try {
-            const result = await signupUser(signupData);
+            const result = await axiosInstance.post('/user/signup', signupData);
             alert(result.msg || 'Profile added successfully!');
             router.push('/Profile');  // Navigate to the edit profile page
-
         } catch (error) {
             console.error('Error adding profile:', error.response || error);
             alert('Error: ' + (error.response?.data?.msg || 'Something went wrong.'));
         }
-    };
-
-    const navigateToEditProfile = () => {
-        router.push('/Profile');  // Navigate to the edit profile page
     };
 
     if (status === 'loading') {
@@ -126,7 +121,7 @@ export default function Form() {
 
     return (
         <div className="container mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
-            <h1 className="text-2xl font-bold mb-6">Additional User Informations</h1>
+            <h1 className="text-2xl font-bold mb-6">Additional User Information</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex flex-col">
                     <label className="text-gray-700 font-semibold">Name:</label>
@@ -195,7 +190,6 @@ export default function Form() {
                 </div>
                 <button
                     type="submit"
-                    onClick={navigateToEditProfile}
                     className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
                 >
                     Add Profile
