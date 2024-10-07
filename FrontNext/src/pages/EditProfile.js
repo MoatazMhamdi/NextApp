@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { signupUser } from './service/userService';  // Adjust path to your service function
+import { updateUser } from './service/userService';  // Adjust path to your service function
+import axios from 'axios';  // To consume the getUserById service
 
-export default function Profile() {
-    const { data: session, status } = useSession();
+export default function EditProfile() {
     const [userData, setUserData] = useState({
         name: '',
         email: '',
@@ -12,24 +11,23 @@ export default function Profile() {
         address: '',
         dateNaissance: ''
     });
-
     const router = useRouter();
+    const { id } = router.query;  // Extract user ID from URL
 
     useEffect(() => {
-        if (session) {
-            setUserData({
-                name: session.user.name || '',
-                email: session.user.email || '',
-                phone_nbr: session.user.phone_nbr || '',
-                address: session.user.address || '',
-                dateNaissance: session.user.dateNaissance || ''
-            });
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`/api/users/${id}`);  // Consume the getUserById service
+                setUserData(response.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        if (id) {
+            fetchUserData();
         }
-    }, [session]);
+    }, [id]);
 
-    const navigateToEditProfile = () => {
-        router.push('/Profile');  // Navigate to the edit profile page
-    };
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUserData((prevData) => ({
@@ -37,6 +35,7 @@ export default function Profile() {
             [name]: value
         }));
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -49,26 +48,19 @@ export default function Profile() {
         };
 
         try {
-            const result = await updateUser(EditProfileData);
-            alert(result.msg || 'Profile added successfully!');
+            const result = await updateUser(id, EditProfileData);  // Pass the user ID
+            alert(result.msg || 'Profile updated successfully!');
+            router.push('/Profile');  // Navigate to the profile page
         } catch (error) {
-            console.error('Error adding profile:', error.response || error);
+            console.error('Error updating profile:', error);
             alert('Error: ' + (error.response?.data?.msg || 'Something went wrong.'));
         }
     };
 
-    if (status === 'loading') {
-        return <p>Loading...</p>;
-    }
-
-    if (!session) {
-        return <p>You are not logged in.</p>;
-    }
-
     return (
         <div className="container mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
-            <h1 className="text-2xl font-bold mb-6">User Profile</h1>
-            <form onSubmit={handleSubmit}  className="space-y-4">
+            <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex flex-col">
                     <label className="text-gray-700 font-semibold">Name:</label>
                     <input
@@ -97,7 +89,6 @@ export default function Profile() {
                         value={userData.phone_nbr}
                         onChange={handleChange}
                         required
-                        
                         className="mt-2 p-2 border rounded-md"
                     />
                 </div>
@@ -108,8 +99,6 @@ export default function Profile() {
                         name="dateNaissance"
                         value={userData.dateNaissance}
                         onChange={handleChange}
-                        
-                        
                         className="mt-2 p-2 border rounded-md"
                     />
                 </div>
@@ -121,18 +110,16 @@ export default function Profile() {
                         value={userData.address}  
                         onChange={handleChange}
                         required
-                        
                         className="mt-2 p-2 border rounded-md"
                     />
                 </div>
+                <button
+                    type="submit"
+                    className="mt-4 bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
+                >
+                    Save Changes
+                </button>
             </form>
-
-            <button
-                onClick={navigateToEditProfile}
-                className="mt-4 bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
-            >
-                Edit Profile
-            </button>
         </div>
     );
 }

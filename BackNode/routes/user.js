@@ -5,6 +5,7 @@ const extractUserId = require("../middleware/auth");
 const params_validator = require("../helpers/params-validator");
 const Joi = require("joi");
 const User = require("../controllers/user");
+const { getById } = require('../controllers/user'); // Adjust the path according to your project structure
 
 // User Signup
 router.post(
@@ -44,17 +45,17 @@ router.get(
 // ******************************** Vet **************************
 router.get(
   "/All",
-  passport.authenticate('jwt', { session: false }),
-  extractUserId,
   User.getAll
 );
 
 router.put(
   "/edit/:id",
-  passport.authenticate('jwt', { session: false }),
-  extractUserId,
+  
   User.updateUser
 );
+
+router.get('/:id', getById);
+
 
 // Update Password
 router.post(

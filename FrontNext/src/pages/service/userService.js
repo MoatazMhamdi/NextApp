@@ -11,11 +11,12 @@ export const signupUser = async (userData) => {
     }
 };
 export const updateUser = async (userId, userData) => {
-    try{
-    const response = await axios.put(`/user/${userId}`, userData);  // Adjust endpoint as needed
-    return response.data;
-    }catch (error){
-        throw error.response ? error.response.data : { msg: 'Something went wrong.' }; // Handle errors
-
+    try {
+        const response = await axiosInstance.put(`/user/${userId}`, userData);
+        return response.data;  // Ensure this returns the correct data structure
+    } catch (error) {
+        console.error('Error in updateUser:', error); // Log the entire error for debugging
+        throw error.response ? error.response.data : { msg: 'Something went wrong.' };
     }
 };
+

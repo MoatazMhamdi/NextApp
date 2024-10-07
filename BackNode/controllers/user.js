@@ -145,7 +145,7 @@ exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const { email, name,surname, phone_nbr,dateNaissance, adress } = req.body;
+    const { email, name, phone_nbr,dateNaissance, address } = req.body;
 
     const user = await User.findById(userId);
 
@@ -155,10 +155,9 @@ exports.updateUser = async (req, res) => {
 
     user.email = email;
     user.name = name;
-    user.surname = surname;
     user.phone_nbr = phone_nbr;
     user.dateNaissance = dateNaissance;
-    user.adress = adress;
+    user.address = address;
 
     const updateUser = await user.save();
 
@@ -168,3 +167,20 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+exports.getById = async (req, res) => {
+    try {
+      const ownerId = req.params.id;
+      const owner = await Owner.findById(ownerId);
+      
+      if (!owner) {
+        return res.status(404).json({ message: 'Owner not found' });
+      }
+      
+      res.status(200).json(owner);
+    } catch (error) {
+      console.error('Error fetching owner by ID:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
+  
