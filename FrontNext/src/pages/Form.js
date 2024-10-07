@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'; 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import axiosInstance from './service/axios'; // Import axios instance
+import axiosInstance from 'axios'; // Import axios instance
 
 const PARIS_COORDINATES = { lat: 48.8566, lng: 2.3522 }; // Coordinates for the center of Paris
 
@@ -102,7 +102,7 @@ export default function Form() {
         };
 
         try {
-            const result = await axiosInstance.post('/user/signup', signupData);
+            const result = await axiosInstance.post('http://localhost:4000/user/signup', signupData);
             alert(result.msg || 'Profile added successfully!');
             router.push('/Profile');  // Navigate to the edit profile page
         } catch (error) {

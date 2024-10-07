@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from './service/axios';
+import axios from 'axios';
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
@@ -16,7 +16,7 @@ export default function UserList() {
     // Fetch the list of users
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('/user/All');
+            const response = await axios.get('http://localhost:4000/user/All');
             setUsers(response.data);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -52,7 +52,7 @@ export default function UserList() {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`/user/edit/${selectedUser._id}`, editFormData);  // Update user
+            await axios.put(`http://localhost:4000/user/edit/${selectedUser._id}`, editFormData);  // Update user
             fetchUsers();  // Refresh the user list after updating
             setShowEditModal(false);  // Hide the modal after submitting
         } catch (error) {
